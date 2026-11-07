@@ -1,2 +1,13 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Exclude generated outputs from repository language statistics
+bin/** linguist-generated
+obj/** linguist-generated
+x64/** linguist-generated
+x86/** linguist-generated
+*.Designer.cs linguist-generated
+*.designer.cs linguist-generated
+
+# Third-party NuGet dependencies
+packages/** linguist-vendored

@@ -1,2 +1,23 @@
-Properties/PublishProfiles
-.vs
+Properties/PublishProfiles/
+# Visual Studio local state and generated build outputs
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+
+# Local secrets and OS files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+
+# NuGet packages can be restored from packages.config
+/packages/
