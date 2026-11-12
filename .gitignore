@@ -21,3 +21,7 @@ Thumbs.db
 
 # NuGet packages can be restored from packages.config
 /packages/
+
+
+# Private local database configuration
+ConnectionStrings.config

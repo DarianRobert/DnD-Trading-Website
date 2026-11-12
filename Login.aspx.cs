@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
@@ -7,7 +7,8 @@ namespace DNDWebsite
 {
     public partial class Login : System.Web.UI.Page
     {
-        private readonly string connectionString = ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
+        private readonly string connectionString =
+            ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -61,7 +62,8 @@ namespace DNDWebsite
                     }
 
                     signupTitle.InnerText = "Set Your Password";
-                    lblSignupMessage.Text = "We found your account. Please set a password and choose a verification question.";
+                    lblSignupMessage.Text =
+                        "We found your account. Please set a password and choose a verification question.";
 
                     loginSection.Style["display"] = "none";
                     signupSection.Style["display"] = "block";
@@ -95,7 +97,8 @@ namespace DNDWebsite
                 conn.Open();
 
                 // --- CLIENT LOGIN ---
-                string clientQuery = "SELECT ClientID, ClientName, ClientEmail, ClientPassword FROM Client WHERE ClientEmail = @Input";
+                string clientQuery =
+                    "SELECT ClientID, ClientName, ClientEmail, ClientPassword FROM Client WHERE ClientEmail = @Input";
                 SqlCommand clientCmd = new SqlCommand(clientQuery, conn);
                 clientCmd.Parameters.AddWithValue("@Input", input);
                 SqlDataReader reader = clientCmd.ExecuteReader();
@@ -123,7 +126,8 @@ namespace DNDWebsite
                         reader.Close();
 
                         lblMessage.Text = "Client login successful! Redirecting...";
-                        ClientScript.RegisterStartupScript(this.GetType(), "redirect",
+                        ClientScript.RegisterStartupScript(
+                            this.GetType(), "redirect",
                             "setTimeout(function(){ window.location='Default.aspx'; }, 2000);", true);
                         return;
                     }
@@ -141,7 +145,8 @@ namespace DNDWebsite
                 reader.Close();
 
                 // --- USER LOGIN ---
-                string userQuery = "SELECT UserName, UserFirstName, UserLastName, UserType, UserPassword, UserOptOut FROM [User] WHERE UserName = @Input";
+                string userQuery =
+                    "SELECT UserName, UserFirstName, UserLastName, UserType, UserPassword, UserOptOut FROM [User] WHERE UserName = @Input";
                 SqlCommand userCmd = new SqlCommand(userQuery, conn);
                 userCmd.Parameters.AddWithValue("@Input", input);
                 reader = userCmd.ExecuteReader();
@@ -157,7 +162,8 @@ namespace DNDWebsite
                     {
                         if (isOptedOut)
                         {
-                            lblMessage.Text = "Access Denied: This account is currently inactive. Please contact support if you believe this is a mistake.";
+                            lblMessage.Text =
+                                "Access Denied: This account is currently inactive. Please contact support if you believe this is a mistake.";
                             lblMessage.ForeColor = System.Drawing.Color.Red;
                             reader.Close();
                             return;
@@ -171,7 +177,8 @@ namespace DNDWebsite
                         reader.Close();
 
                         lblMessage.Text = "User login successful! Redirecting...";
-                        ClientScript.RegisterStartupScript(this.GetType(), "redirect",
+                        ClientScript.RegisterStartupScript(
+                            this.GetType(), "redirect",
                             "setTimeout(function(){ window.location='Default.aspx'; }, 2000);", true);
                         return;
                     }
@@ -194,7 +201,7 @@ namespace DNDWebsite
         }
 
         // SIGNUP / SET PASSWORD
-        protected void btnSignup_Click(object sender, EventArgs e)
+        protected void btnSignup_Click(object sender, EventArgs e)
         {
             string name = txtSignupName.Text.Trim();
             string email = txtSignupEmail.Text.Trim();
@@ -203,9 +210,10 @@ namespace DNDWebsite
             string question = ddlQuestion.SelectedValue;
             string answer = txtSignupAnswer.Text.Trim();
 
-            bool isSetPasswordMode = hfSetPasswordMode.Value == "true";
+            bool isSetPasswordMode = hfSetPasswordMode.Value == "true";
 
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(question) || string.IsNullOrEmpty(answer))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(question) ||
+                string.IsNullOrEmpty(answer))
             {
                 lblSignupMessage.Text = "Please fill in email, password, and verification fields.";
                 signupSection.Style["display"] = "block";
@@ -264,30 +272,30 @@ namespace DNDWebsite
                 }
             }
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
 
-                // --- CHECK IF EMAIL EXISTS ---
-                string checkQuery = "SELECT ClientPassword FROM Client WHERE ClientEmail = @Email";
+                // --- CHECK IF EMAIL EXISTS ---
+                string checkQuery = "SELECT ClientPassword FROM Client WHERE ClientEmail = @Email";
                 SqlCommand checkCmd = new SqlCommand(checkQuery, conn);
                 checkCmd.Parameters.AddWithValue("@Email", email);
 
                 object result = checkCmd.ExecuteScalar();
 
-                // === CASE B or C: EMAIL EXISTS ===
-                if (result != null)
+                // === CASE B or C: EMAIL EXISTS ===
+                if (result != null)
                 {
                     string existingPassword = (result == DBNull.Value) ? null : result.ToString();
 
-                    // === CASE B: Password not set yet (NULL or empty) → UPDATE ===
-                    if (string.IsNullOrEmpty(existingPassword))
+                    // === CASE B: Password not set yet (NULL or empty) → UPDATE ===
+                    if (string.IsNullOrEmpty(existingPassword))
                     {
-                        // Build the query dynamically based on which fields are editable
-                        string updateQuery = @"UPDATE Client 
-                                               SET ClientPassword=@Password, 
-                                                   ClientQuestion=@Question, 
-                                                   ClientAnswer=@Answer";
+                        // Build the query dynamically based on which fields are editable
+                        string updateQuery = @"UPDATE Client
+                                               SET ClientPassword=@Password,
+                                                   ClientQuestion=@Question,
+                                                   ClientAnswer=@Answer";
 
                         if (!txtSignupName.ReadOnly)
                         {
@@ -301,8 +309,8 @@ namespace DNDWebsite
 
                         SqlCommand updateCmd = new SqlCommand(updateQuery, conn);
 
-                        // Add parameters
-                        updateCmd.Parameters.AddWithValue("@Password", password);
+                        // Add parameters
+                        updateCmd.Parameters.AddWithValue("@Password", password);
                         updateCmd.Parameters.AddWithValue("@Question", question);
                         updateCmd.Parameters.AddWithValue("@Answer", answer);
                         updateCmd.Parameters.AddWithValue("@Email", email);
@@ -316,15 +324,15 @@ namespace DNDWebsite
                             updateCmd.Parameters.AddWithValue("@Phone", phone);
                         }
 
-                        updateCmd.ExecuteNonQuery();
+                        updateCmd.ExecuteNonQuery();
 
                         Response.Redirect("Login.aspx?signup=success");
                         return;
                     }
                     else
                     {
-                        // === CASE C: Email exists AND password already set ===
-                        lblSignupMessage.Text = "An account with this email already exists.";
+                        // === CASE C: Email exists AND password already set ===
+                        lblSignupMessage.Text = "An account with this email already exists.";
                         signupSection.Style["display"] = "block";
                         loginSection.Style["display"] = "none";
                         signupSection.Visible = true;
@@ -332,13 +340,13 @@ namespace DNDWebsite
                     }
                 }
 
-                // === CASE A: Email does not exist → INSERT ===
-                string insertQuery = @"INSERT INTO Client 
-                               (ClientName, ClientPhoneNumber, ClientEmail, ClientPassword, ClientOptOut, ClientQuestion, ClientAnswer)
-                               VALUES (@Name, @Phone, @Email, @Password, 0, @Question, @Answer)";
+                // === CASE A: Email does not exist → INSERT ===
+                string insertQuery = @"INSERT INTO Client 
+                               (ClientName, ClientPhoneNumber, ClientEmail, ClientPassword, ClientOptOut, ClientQuestion, ClientAnswer)
+                               VALUES (@Name, @Phone, @Email, @Password, 0, @Question, @Answer)";
                 SqlCommand insertCmd = new SqlCommand(insertQuery, conn);
                 insertCmd.Parameters.AddWithValue("@Name", name);
-                insertCmd.Parameters.AddWithValue("@Phone", phone);
+                insertCmd.Parameters.AddWithValue("@Phone", phone);
                 insertCmd.Parameters.AddWithValue("@Email", email);
                 insertCmd.Parameters.AddWithValue("@Password", password);
                 insertCmd.Parameters.AddWithValue("@Question", question);
@@ -384,7 +392,9 @@ namespace DNDWebsite
                     form1.DefaultButton = btnResetPassword.UniqueID;
 
                     ClientScript.RegisterStartupScript(this.GetType(), "scrollTop",
-                        "document.getElementById('" + resetSection.ClientID + "').scrollIntoView({behavior:'smooth'});", true);
+                                                       "document.getElementById('" + resetSection.ClientID +
+                                                           "').scrollIntoView({behavior:'smooth'});",
+                                                       true);
                 }
                 else
                 {
@@ -427,14 +437,15 @@ namespace DNDWebsite
 
                     lblResetMessage.Text = "Password reset successful. Redirecting to login...";
                     ClientScript.RegisterStartupScript(this.GetType(), "redirect",
-                        "setTimeout(function(){ window.location='Login.aspx'; }, 2000);", true);
+                                                       "setTimeout(function(){ window.location='Login.aspx'; }, 2000);",
+                                                       true);
                 }
                 else
                 {
                     lblResetMessage.Text = "Incorrect answer.";
                 }
             }
-        }   
+        }
 
         protected void btnBackToHome_Click(object sender, EventArgs e)
         {

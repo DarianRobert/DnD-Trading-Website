@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Web.UI;
@@ -9,12 +9,14 @@ namespace DNDWebsite
 {
     public partial class Supplier : Page
     {
-        private readonly string connectionString = ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
+        private readonly string connectionString =
+            ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             // Only allow Sales Representative and Manager
-            if (Session["UserType"] == null || (Session["UserType"].ToString() != "Sales Representative" && Session["UserType"].ToString() != "Manager"))
+            if (Session["UserType"] == null || (Session["UserType"].ToString() != "Sales Representative" &&
+                                                Session["UserType"].ToString() != "Manager"))
             {
                 Response.Redirect("Default.aspx"); // Not authorized
                 return;
@@ -79,10 +81,11 @@ namespace DNDWebsite
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand(
-                  "INSERT INTO Supplier (SupplierName, SupplierPhoneNumber, SupplierEmail, SupplierOptOut) " +
-                  "VALUES (@Name, @Phone, @Email, @OptOut)", conn))
+                using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                    SqlCommand cmd = new SqlCommand(
+                        "INSERT INTO Supplier (SupplierName, SupplierPhoneNumber, SupplierEmail, SupplierOptOut) " +
+                            "VALUES (@Name, @Phone, @Email, @OptOut)",
+                        conn))
                 {
                     cmd.Parameters.AddWithValue("@Name", name);
                     cmd.Parameters.AddWithValue("@Phone", string.IsNullOrEmpty(phone) ? (object)DBNull.Value : phone);

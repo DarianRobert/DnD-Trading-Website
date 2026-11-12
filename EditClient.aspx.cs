@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -9,16 +9,13 @@ namespace DNDWebsite
 {
     public partial class EditClient : Page
     {
-        private readonly string connectionString = ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
+        private readonly string connectionString =
+            ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
 
-        private readonly string[] SecurityQuestions = new string[]
-        {
-            "What was your childhood nickname?",
-            "What was the name of your first pet?",
-            "What is your mother's maiden name?",
-            "What is your favourite colour?",
-            "What is your favourite fruit?"
-        };
+        private readonly string[] SecurityQuestions =
+            new string[] { "What was your childhood nickname?", "What was the name of your first pet?",
+                           "What is your mother's maiden name?", "What is your favourite colour?",
+                           "What is your favourite fruit?" };
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -63,8 +60,10 @@ namespace DNDWebsite
                 return;
             }
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand("SELECT ClientName, ClientPhoneNumber, ClientEmail, ClientQuestion, ClientAnswer, ClientOptOut FROM Client WHERE ClientID = @ClientID", conn))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                SqlCommand cmd = new SqlCommand(
+                    "SELECT ClientName, ClientPhoneNumber, ClientEmail, ClientQuestion, ClientAnswer, ClientOptOut FROM Client WHERE ClientID = @ClientID",
+                    conn))
             {
                 cmd.Parameters.AddWithValue("@ClientID", clientId);
                 conn.Open();
@@ -174,7 +173,8 @@ namespace DNDWebsite
             string selectedQuestion = ddlQuestion.SelectedItem != null ? ddlQuestion.SelectedItem.Text : "";
             string answer = txtAnswer.Text.Trim();
 
-            bool questionChanged = !string.Equals(originalQuestion ?? "", selectedQuestion ?? "", StringComparison.Ordinal);
+            bool questionChanged =
+                !string.Equals(originalQuestion ?? "", selectedQuestion ?? "", StringComparison.Ordinal);
 
             if (questionChanged)
             {
@@ -197,8 +197,8 @@ namespace DNDWebsite
             bool updatePassword = !string.IsNullOrEmpty(newPassword);
             bool optOut = chkOptOut.Checked;
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = conn.CreateCommand())
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                        conn.CreateCommand())
             {
                 conn.Open();
 
@@ -232,7 +232,8 @@ namespace DNDWebsite
                 cmd.Parameters.AddWithValue("@Name", name);
                 cmd.Parameters.AddWithValue("@Email", email);
                 cmd.Parameters.AddWithValue("@Phone", phone);
-                cmd.Parameters.AddWithValue("@Question", string.IsNullOrEmpty(selectedQuestion) ? (object)DBNull.Value : selectedQuestion);
+                cmd.Parameters.AddWithValue("@Question", string.IsNullOrEmpty(selectedQuestion) ? (object)DBNull.Value
+                                                                                                : selectedQuestion);
                 cmd.Parameters.AddWithValue("@Answer", string.IsNullOrEmpty(answer) ? (object)DBNull.Value : answer);
                 cmd.Parameters.AddWithValue("@OptOut", optOut ? 1 : 0);
                 cmd.Parameters.AddWithValue("@ClientID", clientId);
@@ -247,7 +248,8 @@ namespace DNDWebsite
 
                     if (hfExitMode.Value == "true")
                     {
-                        ClientScript.RegisterStartupScript(this.GetType(), "ExitSave",
+                        ClientScript.RegisterStartupScript(
+                            this.GetType(), "ExitSave",
                             "isDirty = false; showStatusModal('Notification', 'Changes saved.');", true);
                     }
                     else

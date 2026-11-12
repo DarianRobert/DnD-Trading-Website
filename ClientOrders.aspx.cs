@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -11,11 +11,13 @@ namespace DNDWebsite
 {
     public partial class ClientOrders : Page
     {
-        private readonly string connectionString = ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
+        private readonly string connectionString =
+            ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["UserType"] == null || (Session["UserType"].ToString() != "Sales Representative" && Session["UserType"].ToString() != "Manager"))
+            if (Session["UserType"] == null || (Session["UserType"].ToString() != "Sales Representative" &&
+                                                Session["UserType"].ToString() != "Manager"))
             {
                 Response.Redirect("Default.aspx");
                 return;
@@ -49,13 +51,12 @@ namespace DNDWebsite
                     }
                 }
             }
-
         }
 
         private void LoadClientOrders(bool pendingOnly = false, string searchTerm = "")
         {
-            string query = @"SELECT o.OrderID, c.ClientName, o.OrderDate, o.OrderAmount, o.OrderStatus 
-                     FROM [Order] o 
+            string query = @"SELECT o.OrderID, c.ClientName, o.OrderDate, o.OrderAmount, o.OrderStatus
+                     FROM [Order] o
                      INNER JOIN Client c ON o.ClientID = c.ClientID
                      WHERE 1=1";
 
@@ -67,9 +68,8 @@ namespace DNDWebsite
 
             query += " ORDER BY o.OrderID DESC";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, conn))
-            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                SqlCommand cmd = new SqlCommand(query, conn)) using (SqlDataAdapter da = new SqlDataAdapter(cmd))
             {
                 if (!string.IsNullOrEmpty(searchTerm))
                     cmd.Parameters.AddWithValue("@SearchTerm", "%" + searchTerm + "%");
@@ -130,8 +130,8 @@ namespace DNDWebsite
 
         private bool IsOrderFinalized(int orderId)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand("SELECT OrderStatus FROM [Order] WHERE OrderID = @OrderID", conn))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                SqlCommand cmd = new SqlCommand("SELECT OrderStatus FROM [Order] WHERE OrderID = @OrderID", conn))
             {
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 conn.Open();
@@ -160,8 +160,8 @@ namespace DNDWebsite
                 FROM ClientOrderProduct
                 WHERE OrderID = @OrderID";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, conn))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                        new SqlCommand(query, conn))
             {
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 using (SqlDataAdapter da = new SqlDataAdapter(cmd))
@@ -185,8 +185,8 @@ namespace DNDWebsite
                 INNER JOIN Supplier s ON osp.SupplierID = s.SupplierID
                 WHERE osp.OrderID = @OrderID";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, conn))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                        new SqlCommand(query, conn))
             {
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 using (SqlDataAdapter da = new SqlDataAdapter(cmd))
@@ -219,8 +219,8 @@ namespace DNDWebsite
 
             query += " ORDER BY FinalPrice ASC";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, conn))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                        new SqlCommand(query, conn))
             {
                 if (!string.IsNullOrEmpty(supplierFilter))
                     cmd.Parameters.AddWithValue("@SupplierID", supplierFilter);
@@ -239,10 +239,10 @@ namespace DNDWebsite
 
         private void LoadSuppliersFilter()
         {
-            string query = "SELECT SupplierID, SupplierName FROM Supplier WHERE SupplierOptOut = 0 ORDER BY SupplierName";
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, conn))
-            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+            string query =
+                "SELECT SupplierID, SupplierName FROM Supplier WHERE SupplierOptOut = 0 ORDER BY SupplierName";
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                SqlCommand cmd = new SqlCommand(query, conn)) using (SqlDataAdapter da = new SqlDataAdapter(cmd))
             {
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -270,6 +270,7 @@ namespace DNDWebsite
         }
 
         protected void chkPending_CheckedChanged(object sender, EventArgs e) => LoadClientOrders(chkPending.Checked);
+
         protected void btnResetFilter_Click(object sender, EventArgs e)
         {
             chkPending.Checked = false;
@@ -295,7 +296,8 @@ namespace DNDWebsite
                 string productText = row.Cells[1].Text;
                 string supplierText = row.Cells[2].Text;
 
-                lblSelectedSupplierProduct.Text = Server.HtmlDecode(productText) + " — " + Server.HtmlDecode(supplierText);
+                lblSelectedSupplierProduct.Text =
+                    Server.HtmlDecode(productText) + " — " + Server.HtmlDecode(supplierText);
                 lblAddMessage.Text = ""; // Clear any old error messages
             }
         }
@@ -330,12 +332,12 @@ namespace DNDWebsite
             }
 
             decimal price = 0m;
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(
-                @"SELECT sp.SupplierProductPrice, p.ProductSurcharge 
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                SqlCommand cmd = new SqlCommand(@"SELECT sp.SupplierProductPrice, p.ProductSurcharge
                   FROM SupplierProduct sp
                   INNER JOIN Product p ON sp.ProductID = p.ProductID
-                  WHERE sp.ProductID=@ProductID AND sp.SupplierID=@SupplierID", conn))
+                  WHERE sp.ProductID=@ProductID AND sp.SupplierID=@SupplierID",
+                                                conn))
             {
                 cmd.Parameters.AddWithValue("@ProductID", productId);
                 cmd.Parameters.AddWithValue("@SupplierID", supplierId);
@@ -358,12 +360,12 @@ namespace DNDWebsite
             }
 
             string insertQuery = @"
-                INSERT INTO OrderSupplierProduct 
+                INSERT INTO OrderSupplierProduct
                 (OrderID, ProductID, SupplierID, OrderSupplierProductQuantity, OrderSupplierProductPrice, OrderSupplierProductStatus)
                 VALUES (@OrderID, @ProductID, @SupplierID, @Quantity, @Price, 0)";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
+            using (SqlConnection conn =
+                       new SqlConnection(connectionString)) using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
             {
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 cmd.Parameters.AddWithValue("@ProductID", productId);
@@ -390,14 +392,20 @@ namespace DNDWebsite
         protected void gvOrderProducts_RowDeleting(object sender, GridViewDeleteEventArgs e)
         {
             int orderId = Convert.ToInt32(hfSelectedOrderId.Value);
-            if (IsOrderFinalized(orderId)) { e.Cancel = true; return; }
+            if (IsOrderFinalized(orderId))
+            {
+                e.Cancel = true;
+                return;
+            }
 
             GridViewRow row = gvOrderProducts.Rows[e.RowIndex];
             int productId = Convert.ToInt32(gvOrderProducts.DataKeys[e.RowIndex].Values["ProductID"]);
             int supplierId = Convert.ToInt32(gvOrderProducts.DataKeys[e.RowIndex].Values["SupplierID"]);
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand("DELETE FROM OrderSupplierProduct WHERE OrderID=@OrderID AND ProductID=@ProductID AND SupplierID=@SupplierID", conn))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                SqlCommand cmd = new SqlCommand(
+                    "DELETE FROM OrderSupplierProduct WHERE OrderID=@OrderID AND ProductID=@ProductID AND SupplierID=@SupplierID",
+                    conn))
             {
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 cmd.Parameters.AddWithValue("@ProductID", productId);
@@ -414,8 +422,10 @@ namespace DNDWebsite
         private void CalculateAndDisplayRunningTotal(int orderId)
         {
             decimal total = 0m;
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand("SELECT ISNULL(SUM(OrderSupplierProductPrice),0) FROM OrderSupplierProduct WHERE OrderID=@OrderID", conn))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                SqlCommand cmd = new SqlCommand(
+                    "SELECT ISNULL(SUM(OrderSupplierProductPrice),0) FROM OrderSupplierProduct WHERE OrderID=@OrderID",
+                    conn))
             {
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 conn.Open();
@@ -424,17 +434,21 @@ namespace DNDWebsite
             lblRunningTotal.Text = total.ToString("C2");
         }
 
-        protected void btnCreateOrder_Click(object sender, EventArgs e) { /* show modal */ }
+        protected void btnCreateOrder_Click(object sender, EventArgs e)
+        { /* show modal */
+        }
 
         protected void btnConfirmFinalize_Click(object sender, EventArgs e)
         {
             int orderId = Convert.ToInt32(hfSelectedOrderId.Value);
-            if (IsOrderFinalized(orderId)) return;
+            if (IsOrderFinalized(orderId))
+                return;
 
             decimal total = 0m;
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(
-                "SELECT ISNULL(SUM(OrderSupplierProductPrice),0) FROM OrderSupplierProduct WHERE OrderID=@OrderID", conn))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                SqlCommand cmd = new SqlCommand(
+                    "SELECT ISNULL(SUM(OrderSupplierProductPrice),0) FROM OrderSupplierProduct WHERE OrderID=@OrderID",
+                    conn))
             {
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 conn.Open();
@@ -445,8 +459,10 @@ namespace DNDWebsite
             {
                 conn.Open();
                 // Update Order
-                using (SqlCommand cmd = new SqlCommand(
-                    "UPDATE [Order] SET OrderAmount=@Amount, OrderStatus=1, UserName=@UserName WHERE OrderID=@OrderID", conn))
+                using (
+                    SqlCommand cmd = new SqlCommand(
+                        "UPDATE [Order] SET OrderAmount=@Amount, OrderStatus=1, UserName=@UserName WHERE OrderID=@OrderID",
+                        conn))
                 {
                     cmd.Parameters.AddWithValue("@Amount", total);
                     cmd.Parameters.AddWithValue("@UserName", Session["UserName"] ?? DBNull.Value);
@@ -461,8 +477,10 @@ namespace DNDWebsite
                     int cnt = Convert.ToInt32(check.ExecuteScalar());
                     if (cnt > 0)
                     {
-                        using (SqlCommand upd = new SqlCommand(
-                            "UPDATE Payment SET PaymentTotal=@Total, PaymentDue=@Due, PaymentSurplus=0, PaymentStatus=0 WHERE OrderID=@OrderID", conn))
+                        using (
+                            SqlCommand upd = new SqlCommand(
+                                "UPDATE Payment SET PaymentTotal=@Total, PaymentDue=@Due, PaymentSurplus=0, PaymentStatus=0 WHERE OrderID=@OrderID",
+                                conn))
                         {
                             upd.Parameters.AddWithValue("@Total", total);
                             upd.Parameters.AddWithValue("@Due", total);
@@ -472,8 +490,10 @@ namespace DNDWebsite
                     }
                     else
                     {
-                        using (SqlCommand ins = new SqlCommand(
-                            "INSERT INTO Payment (OrderID, PaymentTotal, PaymentDue, PaymentSurplus, PaymentStatus) VALUES (@OrderID,@Total,@Due,0,0)", conn))
+                        using (
+                            SqlCommand ins = new SqlCommand(
+                                "INSERT INTO Payment (OrderID, PaymentTotal, PaymentDue, PaymentSurplus, PaymentStatus) VALUES (@OrderID,@Total,@Due,0,0)",
+                                conn))
                         {
                             ins.Parameters.AddWithValue("@OrderID", orderId);
                             ins.Parameters.AddWithValue("@Total", total);
@@ -485,7 +505,7 @@ namespace DNDWebsite
 
                 // Mark client items completed
                 using (SqlCommand cmd = new SqlCommand(
-                    "UPDATE ClientOrderProduct SET ClientOrderProductStatus=1 WHERE OrderID=@OrderID", conn))
+                           "UPDATE ClientOrderProduct SET ClientOrderProductStatus=1 WHERE OrderID=@OrderID", conn))
                 {
                     cmd.Parameters.AddWithValue("@OrderID", orderId);
                     cmd.ExecuteNonQuery();
@@ -493,7 +513,7 @@ namespace DNDWebsite
 
                 // Mark supplier items completed
                 using (SqlCommand cmd = new SqlCommand(
-                    "UPDATE OrderSupplierProduct SET OrderSupplierProductStatus=1 WHERE OrderID=@OrderID", conn))
+                           "UPDATE OrderSupplierProduct SET OrderSupplierProductStatus=1 WHERE OrderID=@OrderID", conn))
                 {
                     cmd.Parameters.AddWithValue("@OrderID", orderId);
                     cmd.ExecuteNonQuery();
@@ -502,14 +522,16 @@ namespace DNDWebsite
 
             // --------------------- CLIENT EMAIL ---------------------
             string clientEmail = "";
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(
-                "SELECT c.ClientEmail FROM [Order] o INNER JOIN Client c ON o.ClientID=c.ClientID WHERE o.OrderID=@OrderID", conn))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                SqlCommand cmd = new SqlCommand(
+                    "SELECT c.ClientEmail FROM [Order] o INNER JOIN Client c ON o.ClientID=c.ClientID WHERE o.OrderID=@OrderID",
+                    conn))
             {
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 conn.Open();
                 object res = cmd.ExecuteScalar();
-                if (res != null) clientEmail = res.ToString();
+                if (res != null)
+                    clientEmail = res.ToString();
             }
 
             if (!string.IsNullOrEmpty(clientEmail))
@@ -522,11 +544,11 @@ namespace DNDWebsite
                        osp.OrderSupplierProductPrice AS LineTotal
                 FROM OrderSupplierProduct osp
                 INNER JOIN Product p ON osp.ProductID = p.ProductID
-                WHERE osp.OrderID = @OrderID", new SqlConnection(connectionString)))
+                WHERE osp.OrderID = @OrderID",
+                                                       new SqlConnection(connectionString)))
                 {
                     cmd.Parameters.AddWithValue("@OrderID", orderId);
-                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                        da.Fill(clientProducts);
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd)) da.Fill(clientProducts);
                 }
 
                 // Build a HTML email
@@ -534,8 +556,10 @@ namespace DNDWebsite
                 sb.AppendLine("<html><body style='font-family:Arial,sans-serif;'>");
                 sb.AppendLine($"<h2>Order Confirmation - Order #{orderId}</h2>");
                 sb.AppendLine("<p>Dear Customer,<br>Thank you for your order! Here are your order details:</p>");
-                sb.AppendLine("<table border='1' cellspacing='0' cellpadding='6' style='border-collapse:collapse; width:80%;'>");
-                sb.AppendLine("<tr style='background-color:#f2f2f2; text-align:left;'><th>Product</th><th>Quantity</th><th>Unit Price</th><th>Line Total</th></tr>");
+                sb.AppendLine(
+                    "<table border='1' cellspacing='0' cellpadding='6' style='border-collapse:collapse; width:80%;'>");
+                sb.AppendLine(
+                    "<tr style='background-color:#f2f2f2; text-align:left;'><th>Product</th><th>Quantity</th><th>Unit Price</th><th>Line Total</th></tr>");
 
                 decimal clienttotal = 0m;
                 foreach (DataRow row in clientProducts.Rows)
@@ -546,10 +570,12 @@ namespace DNDWebsite
                     decimal lineTotal = Convert.ToDecimal(row["LineTotal"]);
                     clienttotal += lineTotal;
 
-                    sb.AppendLine($"<tr><td>{productName}</td><td>{qty}</td><td>R{unitPrice:F2}</td><td>R{lineTotal:F2}</td></tr>");
+                    sb.AppendLine(
+                        $"<tr><td>{productName}</td><td>{qty}</td><td>R{unitPrice:F2}</td><td>R{lineTotal:F2}</td></tr>");
                 }
 
-                sb.AppendLine($"<tr><td colspan='3' style='text-align:right;'><b>Total Price:</b></td><td><b>R{clienttotal:F2}</b></td></tr>");
+                sb.AppendLine(
+                    $"<tr><td colspan='3' style='text-align:right;'><b>Total Price:</b></td><td><b>R{clienttotal:F2}</b></td></tr>");
                 sb.AppendLine("</table>");
                 sb.AppendLine("<p>Please send proof of payment to <b>DNDTrading22@gmail.com</b>.</p>");
                 sb.AppendLine("<p>Kind regards,<br><b>DND Trading Team</b></p>");
@@ -559,20 +585,18 @@ namespace DNDWebsite
                 SendEmail(clientEmail, $"Your Order #{orderId} - DND Trading", sb.ToString(), true);
             }
 
-
             // Emails to suppliers
             DataTable suppliers = new DataTable();
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(
-                @"SELECT DISTINCT s.SupplierID, s.SupplierEmail, s.SupplierName 
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (
+                SqlCommand cmd = new SqlCommand(@"SELECT DISTINCT s.SupplierID, s.SupplierEmail, s.SupplierName
                   FROM OrderSupplierProduct osp
                   INNER JOIN Supplier s ON osp.SupplierID=s.SupplierID
-                  WHERE osp.OrderID=@OrderID", conn))
+                  WHERE osp.OrderID=@OrderID",
+                                                conn))
             {
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 conn.Open();
-                using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                    da.Fill(suppliers);
+                using (SqlDataAdapter da = new SqlDataAdapter(cmd)) da.Fill(suppliers);
             }
 
             foreach (DataRow sRow in suppliers.Rows)
@@ -582,15 +606,15 @@ namespace DNDWebsite
 
                 DataTable supplierProducts = new DataTable();
                 using (SqlCommand cmd = new SqlCommand(
-                    @"SELECT p.ProductName, osp.OrderSupplierProductQuantity, osp.OrderSupplierProductPrice
+                           @"SELECT p.ProductName, osp.OrderSupplierProductQuantity, osp.OrderSupplierProductPrice
                   FROM OrderSupplierProduct osp
                   INNER JOIN Product p ON osp.ProductID=p.ProductID
-                  WHERE osp.OrderID=@OrderID AND osp.SupplierID=@SupplierID", new SqlConnection(connectionString)))
+                  WHERE osp.OrderID=@OrderID AND osp.SupplierID=@SupplierID",
+                           new SqlConnection(connectionString)))
                 {
                     cmd.Parameters.AddWithValue("@OrderID", orderId);
                     cmd.Parameters.AddWithValue("@SupplierID", sRow["SupplierID"]);
-                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                        da.Fill(supplierProducts);
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd)) da.Fill(supplierProducts);
                 }
 
                 StringBuilder sb = new StringBuilder();
@@ -598,8 +622,10 @@ namespace DNDWebsite
                 sb.AppendLine($"<h2 style='color:#2c3e50;'>New Order Request - Order #{orderId}</h2>");
                 sb.AppendLine($"<p>Dear {supplierName},</p>");
                 sb.AppendLine("<p>Please prepare the following items for delivery to <b>DND Trading</b>:</p>");
-                sb.AppendLine("<table border='1' cellspacing='0' cellpadding='6' style='border-collapse:collapse; width:80%;'>");
-                sb.AppendLine("<tr style='background-color:#f2f2f2; text-align:left;'><th>Product</th><th>Quantity</th><th>Price</th></tr>");
+                sb.AppendLine(
+                    "<table border='1' cellspacing='0' cellpadding='6' style='border-collapse:collapse; width:80%;'>");
+                sb.AppendLine(
+                    "<tr style='background-color:#f2f2f2; text-align:left;'><th>Product</th><th>Quantity</th><th>Price</th></tr>");
 
                 decimal supplierTotal = 0m;
                 foreach (DataRow row in supplierProducts.Rows)
@@ -612,10 +638,12 @@ namespace DNDWebsite
                     sb.AppendLine($"<tr><td>{productName}</td><td>{qty}</td><td>R{price:F2}</td></tr>");
                 }
 
-                sb.AppendLine($"<tr><td colspan='2' style='text-align:right;'><b>Total Price:</b></td><td><b>R{supplierTotal:F2}</b></td></tr>");
+                sb.AppendLine(
+                    $"<tr><td colspan='2' style='text-align:right;'><b>Total Price:</b></td><td><b>R{supplierTotal:F2}</b></td></tr>");
                 sb.AppendLine("</table>");
                 sb.AppendLine("<p>Please confirm receipt of this order and estimated delivery time.</p>");
-                sb.AppendLine("<p>Kind regards,<br><b>DND Trading Team</b><br><small>DNDTrading22@gmail.com</small></p>");
+                sb.AppendLine(
+                    "<p>Kind regards,<br><b>DND Trading Team</b><br><small>DNDTrading22@gmail.com</small></p>");
                 sb.AppendLine("</body></html>");
 
                 SendEmail(supplierEmail, $"New Order Request #{orderId} - DND Trading", sb.ToString(), true);
@@ -633,7 +661,7 @@ namespace DNDWebsite
 
             lblPaymentMessage.Text = "Order has been finalized successfully.";
             lblPaymentMessage.ForeColor = System.Drawing.Color.Green;
-            
+
             ScriptManager.RegisterStartupScript(this, this.GetType(), "HideModal", "hideFinalizeModal();", true);
         }
 
@@ -643,23 +671,21 @@ namespace DNDWebsite
             {
                 using (MailMessage mail = new MailMessage())
                 {
-                    mail.From = new MailAddress("DNDTrading22@gmail.com");
+                    mail.From = new MailAddress(EmailConfiguration.SenderAddress);
                     mail.To.Add(toEmail);
                     mail.Subject = subject;
                     mail.Body = body;
                     mail.IsBodyHtml = isHtml;
 
-                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    using (SmtpClient smtp = EmailConfiguration.CreateClient())
                     {
-                        smtp.Credentials = new System.Net.NetworkCredential("DNDTrading22@gmail.com", "qyax myny exec tzrb");
-                        smtp.EnableSsl = true;
                         smtp.Send(mail);
                     }
                 }
             }
             catch (Exception ex)
             {
-
+                System.Diagnostics.Trace.TraceError("Order email failed: {0}", ex.GetType().Name);
             }
         }
 
@@ -692,8 +718,8 @@ namespace DNDWebsite
         FROM Payment
         WHERE OrderID = @OrderID";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, conn))
+            using (SqlConnection conn = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                        new SqlCommand(query, conn))
             {
                 cmd.Parameters.AddWithValue("@OrderID", orderId);
                 using (SqlDataAdapter da = new SqlDataAdapter(cmd))
@@ -729,7 +755,9 @@ namespace DNDWebsite
                 decimal paymentSurplus = 0m;
                 bool paymentStatus = false;
 
-                using (SqlCommand cmd = new SqlCommand("SELECT PaymentDue, PaymentSurplus, PaymentStatus FROM Payment WHERE OrderID=@OrderID", conn))
+                using (
+                    SqlCommand cmd = new SqlCommand(
+                        "SELECT PaymentDue, PaymentSurplus, PaymentStatus FROM Payment WHERE OrderID=@OrderID", conn))
                 {
                     cmd.Parameters.AddWithValue("@OrderID", orderId);
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -760,10 +788,10 @@ namespace DNDWebsite
 
                 bool newStatus = newDue == 0;
 
-                using (SqlCommand updateCmd = new SqlCommand(
-                    @"UPDATE Payment
+                using (SqlCommand updateCmd = new SqlCommand(@"UPDATE Payment
                       SET PaymentDue=@PaymentDue, PaymentSurplus=@PaymentSurplus, PaymentStatus=@PaymentStatus
-                      WHERE OrderID=@OrderID", conn))
+                      WHERE OrderID=@OrderID",
+                                                             conn))
                 {
                     updateCmd.Parameters.AddWithValue("@PaymentDue", newDue);
                     updateCmd.Parameters.AddWithValue("@PaymentSurplus", newSurplus);
@@ -773,20 +801,21 @@ namespace DNDWebsite
                     updateCmd.ExecuteNonQuery();
                 }
 
-                lblPaymentMessage.Text = $"Payment applied successfully. Remaining due: {newDue:C2}, Surplus: {newSurplus:C2}";
+                lblPaymentMessage.Text =
+                    $"Payment applied successfully. Remaining due: {newDue:C2}, Surplus: {newSurplus:C2}";
                 txtPaymentAmount.Text = "";
 
                 // Refresh Payment Grid
                 LoadPaymentInfo(orderId);
             }
         }
-        
+
         protected void btnResetSupplierFilter_Click(object sender, EventArgs e)
         {
             txtSupplierSearch.Text = "";
-            ddlSuppliers.SelectedIndex = 0; // Reset to "All suppliers"
+            ddlSuppliers.SelectedIndex = 0;   // Reset to "All suppliers"
             gvSupplierProducts.PageIndex = 0; // Reset paging
-            LoadSupplierProducts(); // Reload grid
+            LoadSupplierProducts();           // Reload grid
         }
     }
 }

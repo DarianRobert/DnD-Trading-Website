@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -8,7 +8,8 @@ namespace DNDWebsite
 {
     public partial class Checkout : Page
     {
-        private readonly string connectionString = ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
+        private readonly string connectionString =
+            ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -73,7 +74,7 @@ namespace DNDWebsite
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"
-                    SELECT 
+                    SELECT
                         p.ProductName,
                         osp.OrderSupplierProductQuantity AS Quantity,
                         osp.OrderSupplierProductPrice AS Price
@@ -103,7 +104,7 @@ namespace DNDWebsite
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = @"SELECT PaymentTotal, PaymentDue, PaymentSurplus, PaymentStatus 
+                string query = @"SELECT PaymentTotal, PaymentDue, PaymentSurplus, PaymentStatus
                                  FROM Payment WHERE OrderID = @OrderID";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -140,8 +141,7 @@ namespace DNDWebsite
                     else
                     {
                         lblPaymentStatusMessage.ForeColor = System.Drawing.Color.Green;
-                        lblPaymentStatusMessage.Text =
-                            "Payment received successfully. Thank you!";
+                        lblPaymentStatusMessage.Text = "Payment received successfully. Thank you!";
                     }
                 }
                 else

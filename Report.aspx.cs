@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -19,9 +19,6 @@ namespace DNDWebsite
         public string SalesRepMonthlyJson { get; set; }
         public string Top5BarChartJson { get; set; }
 
-
-
-
         protected void Page_Load(object sender, EventArgs e)
         {
             // Managers only
@@ -41,8 +38,6 @@ namespace DNDWebsite
                 LoadTop5BarChart();
 
                 Response.Write("<script>console.log('RevChartJson: " + RevChartJson + "');</script>");
-
-
             }
         }
 
@@ -60,8 +55,8 @@ namespace DNDWebsite
 
             try
             {
-                using (SqlConnection con = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                using (SqlConnection con = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                           new SqlCommand(query, con))
                 {
                     con.Open();
                     using (SqlDataReader rdr = cmd.ExecuteReader())
@@ -77,11 +72,7 @@ namespace DNDWebsite
                     }
                 }
 
-                var chartData = new
-                {
-                    labels,
-                    values
-                };
+                var chartData = new { labels, values };
 
                 JavaScriptSerializer js = new JavaScriptSerializer();
                 RevChartJson = js.Serialize(chartData);
@@ -97,6 +88,7 @@ namespace DNDWebsite
                 System.Diagnostics.Debug.WriteLine("General Error: " + ex.Message);
             }
         }
+
         private void LoadTop5Chart()
         {
             List<string> productNames = new List<string>();
@@ -113,8 +105,8 @@ namespace DNDWebsite
                 ORDER BY TotalQty DESC;
             ";
 
-            using (SqlConnection con = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, con))
+            using (SqlConnection con = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                       new SqlCommand(query, con))
             {
                 con.Open();
                 SqlDataReader rdr = cmd.ExecuteReader();
@@ -135,7 +127,6 @@ namespace DNDWebsite
             top5ChartJson = new JavaScriptSerializer().Serialize(chartData);
         }
 
-
         private void LoadSalesRepPerformanceChart()
         {
             List<string> labels = new List<string>();
@@ -153,8 +144,8 @@ namespace DNDWebsite
                 ORDER BY TotalSales DESC;
             ";
 
-            using (SqlConnection con = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, con))
+            using (SqlConnection con = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                       new SqlCommand(query, con))
             {
                 con.Open();
                 SqlDataReader rdr = cmd.ExecuteReader();
@@ -170,7 +161,6 @@ namespace DNDWebsite
             SalesRepJson = new JavaScriptSerializer().Serialize(chartData);
         }
 
-
         private void LoadGrossRevLineChart()
         {
             List<string> labels = new List<string>();
@@ -184,8 +174,8 @@ namespace DNDWebsite
                 ORDER BY YEAR(OrderDate), MONTH(OrderDate);
             ";
 
-            using (SqlConnection con = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, con))
+            using (SqlConnection con = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                       new SqlCommand(query, con))
             {
                 con.Open();
                 SqlDataReader rdr = cmd.ExecuteReader();
@@ -200,19 +190,20 @@ namespace DNDWebsite
             var chartData = new { labels, values };
             GrossRevLineJson = new JavaScriptSerializer().Serialize(chartData);
         }
+
         private void LoadSalesRepMonthlyChart()
         {
             string query = @"
-                SELECT 
+                SELECT
                     U.UserFirstName + ' ' + U.UserLastName AS RepName,
                     DATENAME(month, O.OrderDate) + ' ' + CAST(YEAR(O.OrderDate) AS VARCHAR) AS MonthYear,
                     SUM(O.OrderAmount) AS TotalSales
                 FROM [Order] O
                 JOIN [User] U ON O.UserName = U.UserName
                 WHERE U.UserType = 0   -- Sales Rep
-                GROUP BY 
+                GROUP BY
                     U.UserFirstName, U.UserLastName,
-                    YEAR(O.OrderDate), MONTH(O.OrderDate), 
+                    YEAR(O.OrderDate), MONTH(O.OrderDate),
                     DATENAME(month, O.OrderDate)
                 ORDER BY
                     YEAR(O.OrderDate), MONTH(O.OrderDate);
@@ -225,8 +216,8 @@ namespace DNDWebsite
 
             try
             {
-                using (SqlConnection con = new SqlConnection(connectionString))
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                using (SqlConnection con = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                           new SqlCommand(query, con))
                 {
                     con.Open();
                     using (SqlDataReader rdr = cmd.ExecuteReader())
@@ -259,20 +250,10 @@ namespace DNDWebsite
                         values.Add(rep.Value.ContainsKey(m) ? rep.Value[m] : 0);
                     }
 
-                    datasets.Add(new
-                    {
-                        label = rep.Key,
-                        data = values,
-                        fill = false,
-                        tension = 0.2
-                    });
+                    datasets.Add(new { label = rep.Key, data = values, fill = false, tension = 0.2 });
                 }
 
-                var chartData = new
-                {
-                    labels = monthList,
-                    datasets = datasets
-                };
+                var chartData = new { labels = monthList, datasets = datasets };
 
                 JavaScriptSerializer js = new JavaScriptSerializer();
                 SalesRepMonthlyJson = js.Serialize(chartData);
@@ -282,14 +263,15 @@ namespace DNDWebsite
                 SalesRepMonthlyJson = "{}";
             }
         }
+
         private void LoadTop5BarChart()
         {
             List<string> labels = new List<string>();
             List<int> values = new List<int>();
 
             string query = @"
-                SELECT TOP 5 
-                    P.ProductName, 
+                SELECT TOP 5
+                    P.ProductName,
                     SUM(OSP.OrderSupplierProductQuantity) AS TotalQty
                 FROM OrderSupplierProduct OSP
                 JOIN Product P ON OSP.ProductID = P.ProductID
@@ -300,8 +282,8 @@ namespace DNDWebsite
                 ORDER BY TotalQty DESC;
             ";
 
-            using (SqlConnection con = new SqlConnection(connectionString))
-            using (SqlCommand cmd = new SqlCommand(query, con))
+            using (SqlConnection con = new SqlConnection(connectionString)) using (SqlCommand cmd =
+                                                                                       new SqlCommand(query, con))
             {
                 con.Open();
                 using (SqlDataReader rdr = cmd.ExecuteReader())
@@ -314,11 +296,7 @@ namespace DNDWebsite
                 }
             }
 
-            var chartData = new
-            {
-                labels = labels,
-                values = values
-            };
+            var chartData = new { labels = labels, values = values };
 
             JavaScriptSerializer js = new JavaScriptSerializer();
             Top5BarChartJson = js.Serialize(chartData);

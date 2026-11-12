@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -9,11 +9,13 @@ namespace DNDWebsite
 {
     public partial class SupplierProducts : Page
     {
-        private string connectionString = ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
+        private string connectionString =
+            ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["UserType"] == null || (Session["UserType"].ToString() != "Sales Representative" && Session["UserType"].ToString() != "Manager"))
+            if (Session["UserType"] == null || (Session["UserType"].ToString() != "Sales Representative" &&
+                                                Session["UserType"].ToString() != "Manager"))
             {
                 Response.Redirect("Default.aspx");
                 return;
@@ -64,7 +66,7 @@ namespace DNDWebsite
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"
-                SELECT 
+                SELECT
                     p.ProductID,
                     s.SupplierID,
                     p.ProductName,
@@ -156,7 +158,7 @@ namespace DNDWebsite
                     conn.Open();
 
                     string updateQuery = @"
-                    UPDATE Product 
+                    UPDATE Product
                     SET ProductName = @Name,
                     ProductSurcharge = @Surcharge
                     WHERE ProductID = @ProductID;
@@ -191,7 +193,8 @@ namespace DNDWebsite
 
         protected void btnAddProduct_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtProductName.Text.Trim()) || string.IsNullOrEmpty(txtPrice.Text.Trim()) || ddlSupplier.SelectedIndex == -1)
+            if (string.IsNullOrEmpty(txtProductName.Text.Trim()) || string.IsNullOrEmpty(txtPrice.Text.Trim()) ||
+                ddlSupplier.SelectedIndex == -1)
             {
                 lblMessage.Text = "Please enter all fields.";
                 return;
@@ -205,12 +208,14 @@ namespace DNDWebsite
                     string insertQuery = @"
                         INSERT INTO Product (ProductName, ProductSurcharge) VALUES (@ProductName, @Surcharge);
                         DECLARE @ProductID int = SCOPE_IDENTITY();
-                        INSERT INTO SupplierProduct (ProductID, SupplierID, SupplierProductPrice) 
+                        INSERT INTO SupplierProduct (ProductID, SupplierID, SupplierProductPrice)
                         VALUES (@ProductID, @SupplierID, @Price);";
 
                     SqlCommand cmd = new SqlCommand(insertQuery, conn);
                     cmd.Parameters.AddWithValue("@ProductName", txtProductName.Text.Trim());
-                    cmd.Parameters.AddWithValue("@Surcharge", string.IsNullOrEmpty(txtSurcharge.Text.Trim()) ? 0 : Convert.ToDecimal(txtSurcharge.Text.Trim()));
+                    cmd.Parameters.AddWithValue("@Surcharge", string.IsNullOrEmpty(txtSurcharge.Text.Trim())
+                                                                  ? 0
+                                                                  : Convert.ToDecimal(txtSurcharge.Text.Trim()));
                     cmd.Parameters.AddWithValue("@SupplierID", Convert.ToInt32(ddlSupplier.SelectedValue));
                     cmd.Parameters.AddWithValue("@Price", Convert.ToDecimal(txtPrice.Text.Trim()));
                     cmd.ExecuteNonQuery();
