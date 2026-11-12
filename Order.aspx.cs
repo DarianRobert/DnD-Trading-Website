@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -9,7 +9,8 @@ namespace DNDWebsite
 {
     public partial class Order : System.Web.UI.Page
     {
-        private readonly string connectionString = ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
+        private readonly string connectionString =
+            ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -38,10 +39,10 @@ namespace DNDWebsite
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     string query = @"
-                        SELECT 
-                            o.OrderID, 
-                            o.OrderDate, 
-                            o.OrderAmount, 
+                        SELECT
+                            o.OrderID,
+                            o.OrderDate,
+                            o.OrderAmount,
                             o.OrderStatus,
                             p.PaymentStatus
                         FROM [Order] o
@@ -63,7 +64,8 @@ namespace DNDWebsite
                     foreach (DataRow row in dt.Rows)
                     {
                         bool orderStatus = Convert.ToBoolean(row["OrderStatus"]);
-                        bool paymentStatus = row["PaymentStatus"] != DBNull.Value && Convert.ToBoolean(row["PaymentStatus"]);
+                        bool paymentStatus =
+                            row["PaymentStatus"] != DBNull.Value && Convert.ToBoolean(row["PaymentStatus"]);
 
                         row["OrderStatusText"] = orderStatus ? "Completed" : "Pending";
                         row["PaymentStatusText"] = paymentStatus ? "Paid" : "Unpaid";
@@ -72,9 +74,7 @@ namespace DNDWebsite
                     gvOrders.DataSource = dt;
                     gvOrders.DataBind();
 
-                    lblMessage.Text = dt.Rows.Count == 0
-                        ? "You have no orders at this time."
-                        : "";
+                    lblMessage.Text = dt.Rows.Count == 0 ? "You have no orders at this time." : "";
                 }
             }
             catch (Exception ex)

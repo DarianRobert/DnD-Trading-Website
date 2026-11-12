@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
@@ -8,13 +8,13 @@ namespace DNDWebsite
 {
     public partial class Clients : System.Web.UI.Page
     {
-        private string connectionString = ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
+        private string connectionString =
+            ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["UserType"] == null ||
-                (Session["UserType"].ToString() != "Sales Representative" &&
-                 Session["UserType"].ToString() != "Manager"))
+            if (Session["UserType"] == null || (Session["UserType"].ToString() != "Sales Representative" &&
+                                                Session["UserType"].ToString() != "Manager"))
             {
                 Response.Redirect("Default.aspx");
                 return;

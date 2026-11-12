@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Web.UI;
@@ -7,7 +7,8 @@ namespace DNDWebsite
 {
     public partial class _Default : Page
     {
-        private readonly string connectionString = ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
+        private readonly string connectionString =
+            ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -66,7 +67,6 @@ namespace DNDWebsite
                 btnLogin.Visible = true;
                 btnLogout.Visible = false;
             }
-
 
             if (!IsPostBack)
             {
@@ -151,7 +151,6 @@ namespace DNDWebsite
             }
         }
 
-
         private void LoadStats()
         {
             try
@@ -171,7 +170,8 @@ namespace DNDWebsite
 
                     // Products Sold
                     int productsSold = 0;
-                    using (SqlCommand cmd = new SqlCommand("SELECT SUM(OrderSupplierProductQuantity) FROM [OrderSupplierProduct]", conn))
+                    using (SqlCommand cmd = new SqlCommand(
+                               "SELECT SUM(OrderSupplierProductQuantity) FROM [OrderSupplierProduct]", conn))
                     {
                         var result = cmd.ExecuteScalar();
                         productsSold = (result != DBNull.Value) ? Convert.ToInt32(result) : 0;
@@ -194,10 +194,8 @@ namespace DNDWebsite
             }
         }
 
-
         protected void btnHelp_Click(object sender, EventArgs e)
         {
-
         }
 
         protected void btnLogin_Click(object sender, EventArgs e)

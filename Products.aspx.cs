@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Web.UI;
@@ -8,7 +8,8 @@ namespace DNDWebsite
 {
     public partial class Products : Page
     {
-        private readonly string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
+        private readonly string connectionString =
+            System.Configuration.ConfigurationManager.ConnectionStrings["DNDConnectionString"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -41,7 +42,7 @@ namespace DNDWebsite
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"
-                    SELECT DISTINCT p.ProductID, p.ProductName, p.ProductSurcharge 
+                    SELECT DISTINCT p.ProductID, p.ProductName, p.ProductSurcharge
                     FROM Product p
                     INNER JOIN SupplierProduct sp ON p.ProductID = sp.ProductID
                     INNER JOIN Supplier s ON sp.SupplierID = s.SupplierID
@@ -100,7 +101,7 @@ namespace DNDWebsite
                     quantity = parsedQty;
                 }
 
-                DataTable dt = ViewState["Products"] as DataTable;
+                DataTable dt = ViewState["Products"] as DataTable;
                 if (dt == null)
                 {
                     dt = new DataTable();
@@ -115,18 +116,19 @@ namespace DNDWebsite
 
                 ViewState["Products"] = dt;
 
-                gvProducts.DataSource = dt;
+                gvProducts.DataSource = dt;
                 gvProducts.DataBind();
 
-                if (upSelectedProducts != null)
+                if (upSelectedProducts != null)
                     upSelectedProducts.Update();
 
                 txtFilter.Text = "";
 
-                LoadAvailableProducts();
+                LoadAvailableProducts();
 
-                string script = $"document.getElementById('{txtFilter.ClientID}').value = '';";
-                ScriptManager.RegisterStartupScript(upProducts, upProducts.GetType(), "ClearFilterScript", script, true);
+                string script = $"document.getElementById('{txtFilter.ClientID}').value = '';";
+                ScriptManager.RegisterStartupScript(upProducts, upProducts.GetType(), "ClearFilterScript", script,
+                                                    true);
             }
         }
 
@@ -210,7 +212,8 @@ namespace DNDWebsite
 
             if (!productExists)
             {
-                string message = $"Warning: We could not find a match for \"{product}\" in our database. We will try our best to source it, but availability is not guaranteed.";
+                string message =
+                    $"Warning: We could not find a match for \"{product}\" in our database. We will try our best to source it, but availability is not guaranteed.";
                 string script = $"showValidationModal('{message}');";
                 ClientScript.RegisterStartupScript(this.GetType(), "ProductNotFoundModal", script, true);
             }
@@ -248,7 +251,7 @@ namespace DNDWebsite
             gvProducts.DataBind();
         }
 
-        protected void btnCreateOrder_Click(object sender, EventArgs e)
+        protected void btnCreateOrder_Click(object sender, EventArgs e)
         {
             DataTable dt = ViewState["Products"] as DataTable;
             if (dt == null || dt.Rows.Count == 0)
@@ -303,7 +306,8 @@ namespace DNDWebsite
         private void CreateOrder()
         {
             DataTable dt = ViewState["Products"] as DataTable;
-            if (dt == null || dt.Rows.Count == 0) return;
+            if (dt == null || dt.Rows.Count == 0)
+                return;
 
             string clientEmail = Session["UserEmail"].ToString();
             int clientID;
@@ -324,7 +328,7 @@ namespace DNDWebsite
                 clientID = Convert.ToInt32(result);
 
                 string insertOrder = @"INSERT INTO [Order] (ClientID, UserName, OrderDate, OrderAmount, OrderStatus) 
-                                       VALUES (@ClientID, '', @OrderDate, 0, 0); SELECT SCOPE_IDENTITY();";
+                                       VALUES (@ClientID, '', @OrderDate, 0, 0); SELECT SCOPE_IDENTITY();";
                 SqlCommand orderCmd = new SqlCommand(insertOrder, conn);
                 orderCmd.Parameters.AddWithValue("@ClientID", clientID);
                 orderCmd.Parameters.AddWithValue("@OrderDate", DateTime.Today);
@@ -336,8 +340,8 @@ namespace DNDWebsite
                     int quantity = Convert.ToInt32(row["Quantity"]);
 
                     string insertProduct = @"INSERT INTO ClientOrderProduct 
-                                             (OrderID, ClientID, ClientOrderProductName, ClientOrderProductQuantity, ClientOrderProductStatus)
-                                             VALUES (@OrderID, @ClientID, @ProductName, @Quantity, 0)";
+                                             (OrderID, ClientID, ClientOrderProductName, ClientOrderProductQuantity, ClientOrderProductStatus)
+                                             VALUES (@OrderID, @ClientID, @ProductName, @Quantity, 0)";
                     SqlCommand prodCmd = new SqlCommand(insertProduct, conn);
                     prodCmd.Parameters.AddWithValue("@OrderID", orderID);
                     prodCmd.Parameters.AddWithValue("@ClientID", clientID);
@@ -347,15 +351,16 @@ namespace DNDWebsite
                 }
 
                 string insertPayment = @"INSERT INTO Payment 
-                                         (OrderID, PaymentTotal, PaymentDue, PaymentSurplus, PaymentStatus)
-                                         VALUES (@OrderID, 0, 0, 0, 0)";
+                                         (OrderID, PaymentTotal, PaymentDue, PaymentSurplus, PaymentStatus)
+                                         VALUES (@OrderID, 0, 0, 0, 0)";
                 SqlCommand paymentCmd = new SqlCommand(insertPayment, conn);
                 paymentCmd.Parameters.AddWithValue("@OrderID", orderID);
                 paymentCmd.ExecuteNonQuery();
             }
 
             lblMessage.ForeColor = System.Drawing.Color.Green;
-            lblMessage.Text = "Order request created successfully. You will be redirected to the home page in 5 seconds.";
+            lblMessage.Text =
+                "Order request created successfully. You will be redirected to the home page in 5 seconds.";
 
             btnCreateOrder.Enabled = false;
             InitializeClientProductsGrid();
@@ -368,7 +373,7 @@ namespace DNDWebsite
         {
             CreateOrder();
         }
-        
+
         protected void btnResetFilter_Click(object sender, EventArgs e)
         {
             txtFilter.Text = "";
